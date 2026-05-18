@@ -1,9 +1,11 @@
 
 
 import { useTenantTheme } from "../../theme/tenantTheme";
+import { useNavigate } from "react-router-dom";
 import type { CSSProperties } from "react";
 
 export function MainPage() {
+    const navigate = useNavigate();
     const { theme } = useTenantTheme();
 
     const tenantStyles = {
@@ -81,6 +83,20 @@ export function MainPage() {
                     </div>
                     <div className="mt-4 rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-500">
                         Nenhum exame disponível no momento.
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                        <button
+                            onClick={() => navigate("/home")}
+                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                        >
+                            ← Home
+                        </button>
+                        <button
+                            onClick={() => navigate("/login")}
+                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                        >
+                            Login →
+                        </button>
                     </div>
                 </section>
             </main>

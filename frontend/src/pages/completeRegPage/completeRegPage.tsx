@@ -1,7 +1,9 @@
 import { useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTenantTheme } from "../../theme/tenantTheme";
 
 export function CompleteRegPage() {
+	const navigate = useNavigate();
 	const { theme } = useTenantTheme();
 	const [cpf, setCpf] = useState("");
 	const [phone, setPhone] = useState("");
@@ -232,6 +234,22 @@ export function CompleteRegPage() {
 							>
 								Salvar e sair
 							</button>
+							<div className="mt-4 flex gap-2">
+								<button
+									type="button"
+									onClick={() => navigate("/register")}
+									className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+								>
+									← Voltar
+								</button>
+								<button
+									type="button"
+									onClick={() => navigate("/login")}
+									className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+								>
+									Login →
+								</button>
+							</div>
 						</div>
 					</aside>
 				</form>

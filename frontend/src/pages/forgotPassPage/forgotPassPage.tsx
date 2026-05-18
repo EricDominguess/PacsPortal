@@ -1,7 +1,9 @@
 import { useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTenantTheme } from "../../theme/tenantTheme";
 
 export function ForgotPassPage() {
+	const navigate = useNavigate();
 	const [email, setEmail] = useState("");
 	const { theme, applyThemeFromEmail } = useTenantTheme();
 
@@ -80,6 +82,22 @@ export function ForgotPassPage() {
 							>
 								Voltar para login
 							</button>
+							<div className="flex gap-2 pt-2">
+								<button
+									type="button"
+									onClick={() => navigate("/login")}
+									className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+								>
+									← Login
+								</button>
+								<button
+									type="button"
+									onClick={() => navigate("/register")}
+									className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+								>
+									Registrar →
+								</button>
+							</div>
 						</form>
 					</div>
 				</div>

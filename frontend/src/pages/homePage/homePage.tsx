@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import CardSuport from "../../components/cardSuport";
 
 export function HomePage() {
+    const navigate = useNavigate();
     const [showCardSuport, setShowCardSuport] = useState(false);
 
     return (
@@ -110,6 +112,20 @@ export function HomePage() {
                         onClick={() => setShowCardSuport(true)}
                         className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-blue-600/20 hover:bg-blue-700">
                         Falar com suporte
+                    </button>
+                </div>
+                <div className="mt-4 flex gap-2">
+                    <button
+                        onClick={() => navigate("/main")}
+                        className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    >
+                        ← Main
+                    </button>
+                    <button
+                        onClick={() => navigate("/login")}
+                        className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100"
+                    >
+                        Login →
                     </button>
                 </div>
             </section>

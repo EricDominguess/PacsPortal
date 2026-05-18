@@ -1,9 +1,11 @@
 
 
 import { useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTenantTheme } from "../../theme/tenantTheme";
 
 export function RegisterPage() {
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const { theme, applyThemeFromEmail } = useTenantTheme();
 
@@ -106,6 +108,29 @@ export function RegisterPage() {
                             >
                                 Já tenho conta
                             </button>
+                            <div className="flex gap-2 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/login")}
+                                    className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                >
+                                    ← Login
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/")}
+                                    className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                >
+                                    Completar →
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/home")}
+                                    className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                >
+                                    Home →
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -1,9 +1,11 @@
 
 
 import { useState, type CSSProperties } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTenantTheme } from "../../theme/tenantTheme";
 
 export function LoginPage() {
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
     const [emailConfirmed, setEmailConfirmed] = useState(false);
@@ -177,6 +179,29 @@ export function LoginPage() {
                                     >
                                         Criar conta
                                     </button>
+                                    <div className="flex gap-2 pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate("/forgot-password")}
+                                            className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                        >
+                                            ← Recuperar senha
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate("/register")}
+                                            className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                        >
+                                            Registrar →
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => navigate("/main")}
+                                            className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+                                        >
+                                            Main →
+                                        </button>
+                                    </div>
                                 </>
                             )}
                             <div className="rounded-lg border border-slate-200 bg-blue-50/40 px-4 py-3 text-xs text-slate-600 text-center">
