@@ -18,7 +18,7 @@ FROM nginx:stable-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Ajuste clássico para sistemas Single Page Application (SPA) não darem erro 404 ao atualizar rotas internas
-RUN sed -i 's/try_files $uri $uri\/ =404;/try_files $uri $uri\/ \/index.html;/g' /etc/nginx/conf.d/default.conf
-
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
