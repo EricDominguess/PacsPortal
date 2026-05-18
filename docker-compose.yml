@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:  
+  # Banco de Dados (já fica pronto e rodando para quando você trouxer o backend)
+  db:
+    image: postgres:16
+    container_name: pacs_db
+    restart: unless-stopped
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin@123
+      POSTGRES_DB: pacs_portal_db
+    volumes:
+      - pacs_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Portal do Cliente (Front-end compilado no Nginx)
+  portal:
+    build: ./frontend
+    container_name: pacs_portal
+    restart: unless-stopped
+    ports:
+      - "80:80" # Mapeia a porta 80 da VM Debian para a porta 80 do Nginx interno
+    depends_on:
+      - db
+
+volumes:
+  pacs_db_data:
