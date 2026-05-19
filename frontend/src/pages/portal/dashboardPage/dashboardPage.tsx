@@ -72,7 +72,7 @@ export function DashboardPage() {
                         icon="calendar"
                         label="Próxima consulta"
                         value="—"
-                        sub={<a href="#" onClick={(e) => { e.preventDefault(); navigate('/portal/agendar'); }} style={{ color: 'var(--sage)', fontWeight: 600 }}>Agendar agora →</a>}
+                        sub={<a href="#" onClick={(e) => { e.preventDefault(); navigate('/agendar'); }} style={{ color: 'var(--sage)', fontWeight: 600 }}>Agendar agora →</a>}
                     />
                     <StatCard tone="amber" icon="clock" label="Último acesso" value={LAST_LOGIN.short} sub={LAST_LOGIN.device} />
                     <StatCard tone="lavender" icon="bell" label="Notificações" value="3" sub="2 não lidas" />
@@ -135,10 +135,10 @@ export function DashboardPage() {
                             <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4 }}>O que você quer fazer hoje?</div>
                         </div>
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0 }}>
-                            <QuickAction icon="plus-circle" tone="primary" label="Agendar exame" onClick={go('/portal/agendar')} />
-                            <QuickAction icon="calendar" tone="sage" label="Marcar consulta" onClick={go('/portal/agendar')} />
-                            <QuickAction icon="doc" tone="amber" label="Solicitar receita" onClick={go('/portal/documentos')} />
-                            <QuickAction icon="syringe" tone="lavender" label="Carteira de vacinas" onClick={go('/portal/documentos')} />
+                            <QuickAction icon="plus-circle" tone="primary" label="Agendar exame" onClick={go('/agendar')} />
+                            <QuickAction icon="calendar" tone="sage" label="Marcar consulta" onClick={go('/agendar')} />
+                            <QuickAction icon="doc" tone="amber" label="Solicitar receita" onClick={go('/documentos')} />
+                            <QuickAction icon="syringe" tone="lavender" label="Carteira de vacinas" onClick={go('/documentos')} />
                         </div>
                     </Card>
                 </div>
@@ -151,7 +151,7 @@ export function DashboardPage() {
                                 <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4 }}>Resultados liberados nos últimos 12 meses</div>
                             </div>
                             <button
-                                onClick={go('/portal/exames')}
+                                onClick={go('/exames')}
                                 style={{ background: 'transparent', border: 'none', color: 'var(--primary)', fontWeight: 600, fontSize: 13, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                             >
                                 Ver todos <Icon name="chevron-right" size={14} />
@@ -163,8 +163,8 @@ export function DashboardPage() {
                             body="Quando um exame for liberado pelo laboratório, ele aparece automaticamente aqui — você é notificado por e-mail e SMS."
                             action={(
                                 <div style={{ display: 'inline-flex', gap: 8 }}>
-                                    <Button variant="primary" icon="plus-circle" onClick={go('/portal/agendar')}>Agendar exame</Button>
-                                    <Button variant="secondary" onClick={go('/portal/exames')}>Ver exemplo</Button>
+                                    <Button variant="primary" icon="plus-circle" onClick={go('/agendar')}>Agendar exame</Button>
+                                    <Button variant="secondary" onClick={go('/exames')}>Ver exemplo</Button>
                                 </div>
                             )}
                         />
@@ -186,7 +186,7 @@ export function DashboardPage() {
                             </div>
                             <a
                                 href="#"
-                                onClick={(e) => { e.preventDefault(); navigate('/portal/perfil'); }}
+                                onClick={(e) => { e.preventDefault(); navigate('/perfil'); }}
                                 style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginTop: 12, color: 'var(--sage)', fontSize: 13, fontWeight: 700 }}
                             >
                                 Revisar meus dados <Icon name="arrow-right" size={14} />

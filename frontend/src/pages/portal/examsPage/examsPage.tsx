@@ -29,7 +29,7 @@ export function ExamsPage() {
         arquivado: EXAMS.filter((e) => e.status === 'arquivado').length,
     }), []);
 
-    const openExam = (ex: Exam) => navigate(`/portal/exames/${ex.id}`);
+    const openExam = (ex: Exam) => navigate(`/exames/${ex.id}`);
 
     return (
         <PortalLayout current="exames">

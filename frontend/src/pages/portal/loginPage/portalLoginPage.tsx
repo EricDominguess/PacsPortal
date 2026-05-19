@@ -24,7 +24,7 @@ export function PortalLoginPage() {
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        navigate('/portal/home');
+        navigate('/home');
     };
 
     return (

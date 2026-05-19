@@ -17,7 +17,7 @@ export function ExamDetailPage() {
             <PortalLayout current="exames">
                 <div style={{ padding: 40, textAlign: 'center' }}>
                     <h2>Exame não encontrado</h2>
-                    <Button variant="primary" icon="chevron-left" onClick={() => navigate('/portal/exames')}>Voltar</Button>
+                    <Button variant="primary" icon="chevron-left" onClick={() => navigate('/exames')}>Voltar</Button>
                 </div>
             </PortalLayout>
         );
@@ -30,7 +30,7 @@ export function ExamDetailPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-3)' }}>
                     <button
-                        onClick={() => navigate('/portal/exames')}
+                        onClick={() => navigate('/exames')}
                         style={{ background: 'transparent', border: 'none', color: 'var(--text-3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 4, padding: 0, fontSize: 13 }}
                     >
                         <Icon name="chevron-left" size={14} /> Exames

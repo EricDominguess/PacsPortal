@@ -34,7 +34,7 @@ export function ComingSoonPage({ screen }: Props) {
                     <p style={{ color: 'var(--text-2)', fontSize: 15, maxWidth: 400, margin: '12px auto 24px' }}>
                         Essa tela faz parte de uma próxima entrega. Estamos trabalhando para liberar em breve.
                     </p>
-                    <Button variant="primary" icon="chevron-left" onClick={() => navigate('/portal/home')}>Voltar para Início</Button>
+                    <Button variant="primary" icon="chevron-left" onClick={() => navigate('/home')}>Voltar para Início</Button>
                 </div>
             </div>
         </PortalLayout>

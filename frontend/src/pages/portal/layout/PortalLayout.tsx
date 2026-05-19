@@ -8,14 +8,14 @@ import { usePortalTenant } from '../../../tenants/PortalTenantContext';
 import { DemoSwitcher } from '../../../tenants/DemoSwitcher';
 
 const SCREEN_PATHS: Record<ScreenId, string> = {
-    login: '/portal/login',
-    home: '/portal/home',
-    exames: '/portal/exames',
-    'exame-detalhe': '/portal/exames',
-    consultas: '/portal/consultas',
-    agendar: '/portal/agendar',
-    documentos: '/portal/documentos',
-    perfil: '/portal/perfil',
+    login: '/login',
+    home: '/home',
+    exames: '/exames',
+    'exame-detalhe': '/exames',
+    consultas: '/consultas',
+    agendar: '/agendar',
+    documentos: '/documentos',
+    perfil: '/perfil',
 };
 
 interface Props {
@@ -28,7 +28,7 @@ export function PortalLayout({ children, current }: Props) {
     const { tenantId, setTenantId } = usePortalTenant();
 
     const onNavigate = (id: ScreenId) => navigate(SCREEN_PATHS[id]);
-    const onLogout = () => navigate('/portal/login');
+    const onLogout = () => navigate('/login');
 
     return (
         <>
