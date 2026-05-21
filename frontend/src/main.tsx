@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/portal/dashboardPage/dashboardPage'
 import { ExamsPage } from './pages/portal/examsPage/examsPage'
 import { ExamDetailPage } from './pages/portal/examDetailPage/examDetailPage'
 import { ComingSoonPage } from './pages/portal/comingSoonPage/comingSoonPage'
+import { PortalRegisterPage } from './pages/portal/registerPage/registerPage'
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
                     <Route path="/agendar" element={<ComingSoonPage screen="agendar" />} />
                     <Route path="/documentos" element={<ComingSoonPage screen="documentos" />} />
                     <Route path="/perfil" element={<ComingSoonPage screen="perfil" />} />
+                    <Route path="/register" element={<PortalRegisterPage />} />
                 </Routes>
             </Router>
         </PortalTenantProvider>

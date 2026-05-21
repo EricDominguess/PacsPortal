@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Icon, LogoMark, inputStyle } from '../../../components/ui';
 import { usePortalTenant } from '../../../tenants/PortalTenantContext';
 import { TenantPicker } from '../../../tenants/TenantPicker';
-import { Field } from './Field';
+import { Field } from '../loginPage/Field';
 
 const formatCpf = (v: string): string => {
     const d = v.replace(/\D/g, '').slice(0, 11);
@@ -13,13 +13,15 @@ const formatCpf = (v: string): string => {
     return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 };
 
-export function PortalLoginPage() {
+export function PortalRegisterPage() {
     const navigate = useNavigate();
     const { tenant, setTenantId } = usePortalTenant();
+    const [name, setName] = useState('');
     const [cpf, setCpf] = useState('');
+    const [email, setEmail] = useState('');
     const [pwd, setPwd] = useState('');
+    const [confirmPwd, setConfirmPwd] = useState('');
     const [showPwd, setShowPwd] = useState(false);
-    const [remember, setRemember] = useState(true);
     const [pickerOpen, setPickerOpen] = useState(false);
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -83,19 +85,41 @@ export function PortalLoginPage() {
                                     trocar
                                 </button>
                             </div>
-                            <h2 className="serif" style={{ fontSize: 36, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.1 }}>Bem-vindo de volta</h2>
+                            <h2 className="serif" style={{ fontSize: 36, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.1 }}>Bem-vindo, Crie sua conta</h2>
                             <p style={{ color: 'var(--text-2)', fontSize: 14, marginTop: 8 }}>
-                                Acesse com seu CPF e senha para continuar.
+                                Preencha seus dados para continuar.
                             </p>
                         </div>
 
                         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                            <Field label="Nome">
+                                <input
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Seu nome completo"
+                                    style={inputStyle()}
+                                    onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
+                                    onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
+                                />
+                            </Field>
+
                             <Field label="CPF">
                                 <input
                                     value={cpf}
                                     onChange={(e) => setCpf(formatCpf(e.target.value))}
                                     placeholder="000.000.000-00"
                                     inputMode="numeric"
+                                    style={inputStyle()}
+                                    onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
+                                    onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
+                                />
+                            </Field>
+
+                            <Field label="E-mail">
+                                <input
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="seu.email@exemplo.com"
                                     style={inputStyle()}
                                     onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
                                     onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
@@ -126,24 +150,35 @@ export function PortalLoginPage() {
                                 </div>
                             </Field>
 
-                            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: 'var(--text-2)', cursor: 'pointer', marginTop: 2 }}>
-                                <input
-                                    type="checkbox"
-                                    checked={remember}
-                                    onChange={(e) => setRemember(e.target.checked)}
-                                    style={{ accentColor: 'var(--primary)' }}
-                                />
-                                Manter conectado neste dispositivo
-                            </label>
+                            <Field label="Confirmar senha">
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPwd ? 'text' : 'password'}
+                                        value={confirmPwd}
+                                        onChange={(e) => setConfirmPwd(e.target.value)}
+                                        placeholder="Confirme sua senha"
+                                        style={{ ...inputStyle(), paddingRight: 40 }}
+                                        onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
+                                        onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }}
+                                    />
+                                    <button type="button" onClick={() => setShowPwd((v) => !v)} style={{
+                                        position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+                                        width: 30, height: 30, border: 'none', background: 'transparent', cursor: 'pointer',
+                                        color: 'var(--text-3)', borderRadius: 6, display: 'grid', placeItems: 'center',
+                                    }}>
+                                        <Icon name={showPwd ? 'eye-off' : 'eye'} size={16} />
+                                    </button>
+                                </div>
+                            </Field>
 
                             <Button type="submit" variant="primary" full size="md" iconRight="arrow-right" style={{ marginTop: 8 }}>
-                                Entrar
+                                Criar conta
                             </Button>
 
                         </form>
 
                         <div style={{ marginTop: 28, textAlign: 'center', fontSize: 13, color: 'var(--text-2)' }}>
-                            Primeiro acesso? <a href="#" onClick={(e) => { e.preventDefault(); navigate('/register'); }} style={{ color: 'var(--primary)', fontWeight: 600 }}>Criar conta</a>
+                            Já tem uma conta? <a href="#" style={{ color: 'var(--primary)', fontWeight: 600 }}>Entrar</a>
                         </div>
 
                         <div style={{ marginTop: 36, paddingTop: 20, borderTop: '1px solid var(--border)', fontSize: 11, color: 'var(--text-3)', textAlign: 'center' }}>
