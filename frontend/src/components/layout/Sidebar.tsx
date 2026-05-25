@@ -1,14 +1,7 @@
-import type { NavItem, ScreenId } from '../../types/portal';
-import { useTenant } from '../../tenants/PortalTenantContext';
+import type { ScreenId } from '../../types/portal';
+import { CLINIC } from '../../data/clinic';
 import { Icon, LogoMark, Button } from '../ui';
-
-const NAV: NavItem[] = [
-    { id: 'home', label: 'Início', icon: 'home' },
-    { id: 'exames', label: 'Exames', icon: 'flask' },
-    { id: 'consultas', label: 'Consultas', icon: 'calendar' },
-    { id: 'agendar', label: 'Agendar', icon: 'plus-circle' },
-    { id: 'documentos', label: 'Documentos', icon: 'doc' },
-];
+import { NAV_ITEMS } from './navItems';
 
 interface Props {
     current: ScreenId;
@@ -17,7 +10,6 @@ interface Props {
 }
 
 export function Sidebar({ current, onNavigate, onLogout }: Props) {
-    const tenant = useTenant();
     return (
         <aside style={{
             width: 240,
@@ -35,14 +27,14 @@ export function Sidebar({ current, onNavigate, onLogout }: Props) {
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 8px 18px' }}>
                 <LogoMark size={34} />
                 <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tenant.shortName}</div>
+                    <div style={{ fontWeight: 700, fontSize: 14, lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{CLINIC.shortName}</div>
                     <div style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.02em' }}>Portal do Paciente</div>
                 </div>
             </div>
 
             <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '12px 10px 6px' }}>Menu</div>
 
-            {NAV.map((item) => {
+            {NAV_ITEMS.map((item) => {
                 const active = current === item.id;
                 return (
                     <button
@@ -85,7 +77,7 @@ export function Sidebar({ current, onNavigate, onLogout }: Props) {
                     <div style={{ position: 'absolute', right: -20, top: -20, width: 80, height: 80, borderRadius: '50%', background: 'rgba(var(--primary-rgb), 0.08)' }} />
                     <div style={{ position: 'relative' }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--primary)', marginBottom: 4 }}>Precisa de ajuda?</div>
-                        <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 10, lineHeight: 1.45 }}>Fale com {tenant.shortName}.</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-2)', marginBottom: 10, lineHeight: 1.45 }}>Fale com {CLINIC.shortName}.</div>
                         <Button variant="primary" size="sm" icon="mail">Suporte</Button>
                     </div>
                 </div>

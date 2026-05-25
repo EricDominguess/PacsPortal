@@ -7,7 +7,7 @@ interface Props {
     icon: IconName;
     label: ReactNode;
     value: ReactNode;
-    sub: ReactNode;
+    sub?: ReactNode;
 }
 
 export function StatCard({ tone, icon, label, value, sub }: Props) {
@@ -26,7 +26,7 @@ export function StatCard({ tone, icon, label, value, sub }: Props) {
                 </div>
             </div>
             <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1 }}>{value}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div>
+            {sub ? <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 6 }}>{sub}</div> : null}
         </Card>
     );
 }

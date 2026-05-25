@@ -28,7 +28,7 @@ export interface NotificationItem {
     read: boolean;
 }
 
-export type ExamStatus = 'disponivel' | 'em_analise' | 'agendado' | 'arquivado';
+export type ExamStatus = 'disponivel' | 'em_analise' | 'arquivado';
 
 export interface Exam {
     id: string;
@@ -41,6 +41,10 @@ export interface Exam {
     new?: boolean;
     attachments: number;
     schedule?: string;
+    modality?: string;
+    bodyPart?: string;
+    contrast?: string;
+    indication?: string;
 }
 
 export interface CompletionItemModel {
@@ -63,25 +67,8 @@ export interface LastLogin {
     device: string;
 }
 
-export interface PortalTenant {
-    id: string;
-    name: string;
-    shortName: string;
-    initials: string;
-    tagline: string;
-    vibe: 'institutional' | 'wellness' | 'cardiology' | 'maternity';
-    primary: string;
-    primaryHover: string;
-    primarySoft: string;
-    primarySoft2: string;
-    logoGradient: [string, string];
-    heroGradient: [string, string, string];
-    phone: string;
-    email: string;
-    address: string;
-}
 
-export type ScreenId = 'login' | 'home' | 'exames' | 'exame-detalhe' | 'consultas' | 'agendar' | 'documentos' | 'perfil';
+export type ScreenId = 'login' | 'home' | 'exame-detalhe' | 'perfil';
 
 export interface NavItem {
     id: ScreenId;

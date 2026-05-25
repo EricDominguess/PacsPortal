@@ -3,10 +3,12 @@ import { Icon } from '../../../components/ui';
 interface Props {
     name: string;
     size: string;
-    type: 'pdf' | 'image';
+    type: 'pdf' | 'image' | 'dicom';
 }
 
 export function Attachment({ name, size, type }: Props) {
+    const label = type === 'pdf' ? 'PDF' : type === 'dicom' ? 'DCM' : 'IMG';
+    const tone = type === 'pdf' ? 'coral' : type === 'dicom' ? 'primary' : 'lavender';
     return (
         <div style={{
             display: 'flex', alignItems: 'center', gap: 10,
@@ -14,11 +16,11 @@ export function Attachment({ name, size, type }: Props) {
         }}>
             <div style={{
                 width: 32, height: 36, borderRadius: 6,
-                background: type === 'pdf' ? 'var(--coral-soft)' : 'var(--lavender-soft)',
-                color: type === 'pdf' ? 'var(--coral)' : 'var(--lavender)',
+                background: `var(--${tone}-soft)`,
+                color: `var(--${tone})`,
                 display: 'grid', placeItems: 'center', fontSize: 9, fontWeight: 800, letterSpacing: '0.04em',
             }}>
-                {type === 'pdf' ? 'PDF' : 'IMG'}
+                {label}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
