@@ -58,9 +58,6 @@ export function Sidebar({ current, onNavigate, onLogout }: Props) {
                     >
                         <Icon name={item.icon} size={18} stroke={active ? 1.8 : 1.6} />
                         <span>{item.label}</span>
-                        {item.id === 'exames' && (
-                            <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 600, background: active ? '#fff' : 'var(--primary-soft)', color: 'var(--primary)', padding: '1px 7px', borderRadius: 999 }}>3</span>
-                        )}
                     </button>
                 );
             })}

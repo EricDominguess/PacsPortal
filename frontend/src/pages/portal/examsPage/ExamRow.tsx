@@ -52,7 +52,9 @@ export function ExamRow({ exam, onClick, isLast }: Props) {
             <div className="exam-row-status">
                 <Badge tone={s.tone} dot>{s.label}</Badge>
             </div>
-            <Icon className="exam-row-chevron" name="chevron-right" size={16} style={{ color: 'var(--text-3)' }} />
+            <div className="exam-row-chevron">
+                <Icon name="chevron-right" size={16} style={{ color: 'var(--text-3)' }} />
+            </div>
         </div>
     );
 }
