@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PortalDoCliente.Infrastructure.Data;
 
 namespace PortalDoCliente.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsuariosController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -15,9 +18,14 @@ namespace PortalDoCliente.API.Controllers
         }
 
         [HttpGet]
-        public ActionResult<string> Get()
+        public async Task<ActionResult> Get()
         {
-            return Ok(new { mensagem = "API está funcionando!" });
+            var usuarios = await _context.Usuarios
+                .Where(u => u.Ativo)
+                .Select(u => new { u.Id, u.Nome, u.Email, u.DataCriacao })
+                .ToListAsync();
+
+            return Ok(usuarios);
         }
     }
 }

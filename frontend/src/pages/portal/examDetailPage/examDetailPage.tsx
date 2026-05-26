@@ -65,6 +65,7 @@ export function ExamDetailPage() {
                                     Voltar para Home
                                 </Button>
                             </div>
+                            <Button variant="secondary" icon="eye">Visualizar</Button>
                             <Button variant="secondary" icon="download">Baixar laudo</Button>
                             <Button variant="primary" icon="download">Baixar imagens</Button>
                         </div>
