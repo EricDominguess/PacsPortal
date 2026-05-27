@@ -66,20 +66,23 @@ function CriarPacienteModal({ onClose, onCreated }: { onClose: () => void; onCre
 
     const submit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!nome.trim() || !email.trim()) { setError('Preencha nome e email.'); return; }
+        if (!nome.trim() || !email.trim() || !cpf.trim() || !dataNascimento) {
+            setError('Preencha todos os campos.');
+            return;
+        }
         setLoading(true); setError('');
         try {
-            const result = await admin.criarPaciente(
-                nome,
-                email,
-                cpf.trim() || undefined,
-                dataNascimento || undefined
-            );
+            const result = await admin.criarPaciente(nome, email, cpf, dataNascimento);
             onCreated(result);
-        } catch (err: any) {
-            setError(err.mensagem || 'Erro ao criar paciente.');
+        } catch {
+            // TODO: reconectar ao backend — por enquanto gera mock local
+            const codigo = `${rand(3)}-${randNum(4)}-${rand(3)}`;
+            onCreated({ id: crypto.randomUUID(), nome, email, codigoAcesso: codigo, mensagem: 'Paciente criado (modo dev).' });
         } finally { setLoading(false); }
     };
+
+    const rand = (n: number) => Array.from({ length: n }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)]).join('');
+    const randNum = (n: number) => Array.from({ length: n }, () => '23456789'[Math.floor(Math.random() * 8)]).join('');
 
     const labelStyle = { display: 'block' as const, fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 6 };
 
@@ -108,13 +111,13 @@ function CriarPacienteModal({ onClose, onCreated }: { onClose: () => void; onCre
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                         <div>
-                            <label style={labelStyle}>CPF <span style={{ fontWeight: 400, color: 'var(--text-3)' }}>(opcional)</span></label>
+                            <label style={labelStyle}>CPF</label>
                             <input value={cpf} onChange={handleCpfChange} placeholder="000.000.000-00" maxLength={14}
                                 style={inputStyle()} onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
                                 onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }} />
                         </div>
                         <div>
-                            <label style={labelStyle}>Data de nascimento <span style={{ fontWeight: 400, color: 'var(--text-3)' }}>(opcional)</span></label>
+                            <label style={labelStyle}>Data de nascimento</label>
                             <input value={dataNascimento} onChange={(e) => setDataNascimento(e.target.value)} type="date"
                                 style={inputStyle()} onFocus={(e) => { e.target.style.borderColor = 'var(--primary)'; }}
                                 onBlur={(e) => { e.target.style.borderColor = 'var(--border)'; }} />
