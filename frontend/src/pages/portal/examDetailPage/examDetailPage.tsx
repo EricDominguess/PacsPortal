@@ -116,30 +116,6 @@ export function ExamDetailPage() {
                     </Card>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                        <Card>
-                            <h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>Imagens principais</h3>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
-                                {['Axial', 'Sagital', 'Coronal'].map((label) => (
-                                    <div key={label} style={{
-                                        borderRadius: 10,
-                                        border: '1px solid var(--border)',
-                                        background: 'linear-gradient(135deg, var(--bg-subtle), #ffffff)',
-                                        minHeight: 72,
-                                        display: 'grid',
-                                        placeItems: 'center',
-                                        color: 'var(--text-3)',
-                                        fontSize: 11,
-                                        fontWeight: 600,
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.08em',
-                                        gap: 6,
-                                    }}>
-                                        <Icon name="image" size={16} />
-                                        {label}
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
 
                         <Card>
                             <h3 style={{ margin: '0 0 12px', fontSize: 14, fontWeight: 700 }}>Arquivos do exame</h3>
