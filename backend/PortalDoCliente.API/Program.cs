@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PortalDoCliente.Infrastructure.Data;
 using PortalDoCliente.Infrastructure.Security;
+using PortalDoCliente.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,9 @@ builder.Services.AddSwaggerGen();
 
 // Security services
 builder.Services.AddSingleton<PasswordHasher>();
+builder.Services.AddSingleton<CodigoAcessoGenerator>();
+builder.Services.AddSingleton<TokenGenerator>();
+builder.Services.AddScoped<EmailService>();
 
 // Database configuration
 var connectionString = builder.Configuration.GetConnectionString("PostgreSQL");
@@ -49,6 +53,31 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Seed: cria admin padrão se não existir nenhum
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
+
+    db.Database.Migrate();
+
+    if (!db.Usuarios.Any(u => u.Perfil == PortalDoCliente.Domain.Enums.Perfil.Admin))
+    {
+        db.Usuarios.Add(new PortalDoCliente.Domain.Entities.Usuario
+        {
+            Nome = "Administrador",
+            Email = "admin@hospital.com",
+            Senha = hasher.Hash("admin123"),
+            Perfil = PortalDoCliente.Domain.Enums.Perfil.Admin,
+            PrimeiroAcesso = false,
+            EmailConfirmado = true
+        });
+        db.SaveChanges();
+        Console.WriteLine(">>> Admin padrão criado: admin@hospital.com / admin123");
+        Console.WriteLine(">>> TROQUE A SENHA DO ADMIN APÓS O PRIMEIRO LOGIN!");
+    }
+}
+
 // Configure the HTTP request pipeline
 if (app.Environment.IsDevelopment())
 {
@@ -57,7 +86,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<PortalDoCliente.API.Middleware.GlobalExceptionHandler>();
-app.UseHttpsRedirection();
 app.UseCors("Frontend");
 app.UseAuthentication();
 app.UseAuthorization();
