@@ -3,291 +3,101 @@ import { useNavigate } from 'react-router-dom';
 import { Icon, LogoMark } from '../../../components/ui';
 import { CLINIC } from '../../../data/clinic';
 import { useAuth } from '../../../context/AuthContext';
-import { auth } from '../../../services/api';
 import bgPattern from '../../../assets/CIS_patterns_background.jpg';
 
-const loginInput: React.CSSProperties = {
-    width: '100%',
-    padding: '11px 14px',
-    border: '1px solid rgba(255,255,255,0.25)',
-    borderRadius: 10,
-    fontSize: 16,
-    background: 'rgba(255,255,255,0.12)',
-    color: '#fff',
-    outline: 'none',
-};
-
-type Step = 'login' | 'primeiro-acesso' | 'criar-senha' | 'confirmar-email';
+// TODO: MODO DESENVOLVIMENTO — reconectar ao backend antes de produção
 
 export function PortalLoginPage() {
     const navigate = useNavigate();
     const { login } = useAuth();
+    const [isAdmin, setIsAdmin] = useState(false);
 
-    const [step, setStep] = useState<Step>('login');
-    const [email, setEmail] = useState('');
-    const [pwd, setPwd] = useState('');
-    const [showPwd, setShowPwd] = useState(false);
-    const [remember, setRemember] = useState(true);
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [msg, setMsg] = useState('');
-
-    // Primeiro acesso
-    const [codigo, setCodigo] = useState('');
-    const [novaSenha, setNovaSenha] = useState('');
-    const [confirmarSenha, setConfirmarSenha] = useState('');
-
-    // Confirmar email
-    const [tokenEmail, setTokenEmail] = useState('');
-
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault(); setError(''); setLoading(true);
-        try {
-            const res = await auth.login(email, pwd);
-            login(res.token, { nome: res.nome, email: res.email, perfil: res.perfil as 'Admin' | 'Paciente' });
-            navigate(res.perfil === 'Admin' ? '/admin' : '/home');
-        } catch (err: any) {
-            if (err.primeiroAcesso) { setStep('primeiro-acesso'); setError(''); }
-            else if (err.emailNaoConfirmado) { setStep('confirmar-email'); setError(''); }
-            else setError(err.mensagem || 'Erro ao fazer login.');
-        } finally { setLoading(false); }
+    const handleEntrar = () => {
+        const perfil = isAdmin ? 'Admin' : 'Paciente';
+        login('dev-token', {
+            nome: isAdmin ? 'Administrador' : 'Paciente Teste',
+            email: isAdmin ? 'admin@hospital.com' : 'paciente@email.com',
+            perfil,
+        });
+        navigate(isAdmin ? '/admin' : '/home');
     };
 
-    const handleValidarCodigo = async (e: React.FormEvent) => {
-        e.preventDefault(); setError(''); setLoading(true);
-        try {
-            await auth.validarCodigo(email, codigo);
-            setStep('criar-senha');
-        } catch (err: any) {
-            setError(err.mensagem || 'Codigo invalido.');
-        } finally { setLoading(false); }
-    };
-
-    const handleCriarSenha = async (e: React.FormEvent) => {
-        e.preventDefault(); setError(''); setLoading(true);
-        try {
-            const res = await auth.criarSenha(email, codigo, novaSenha, confirmarSenha);
-            setMsg(res.mensagem);
-            setStep('confirmar-email');
-        } catch (err: any) {
-            setError(err.mensagem || 'Erro ao criar senha.');
-        } finally { setLoading(false); }
-    };
-
-    const handleConfirmarEmail = async (e: React.FormEvent) => {
-        e.preventDefault(); setError(''); setLoading(true);
-        try {
-            await auth.confirmarEmail(email, tokenEmail);
-            setMsg('Email confirmado! Faca login com sua nova senha.');
-            setStep('login'); setPwd('');
-        } catch (err: any) {
-            setError(err.mensagem || 'Codigo invalido.');
-        } finally { setLoading(false); }
-    };
-
-    const handleReenviar = async () => {
-        setError(''); setLoading(true);
-        try {
-            const res = await auth.reenviarConfirmacao(email);
-            setMsg(res.mensagem);
-        } catch (err: any) {
-            setError(err.mensagem || 'Erro ao reenviar.');
-        } finally { setLoading(false); }
-    };
-
-    const renderForm = () => {
-        if (step === 'primeiro-acesso') return (
-            <>
-                <div style={{ marginBottom: 24 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px', background: 'rgba(255,255,255,0.47)', borderRadius: 999, marginBottom: 14 }}>
-                        <LogoMark size={20} />
-                    </div>
-                    <h2 className="serif" style={{ fontSize: 28, margin: 0, color: '#fff' }}>Primeiro acesso</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 8 }}>
-                        Digite o codigo fornecido pelo hospital.
-                    </p>
+    const renderForm = () => (
+        <>
+            <div style={{ marginBottom: 24 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px', background: 'rgba(255,255,255,0.47)', borderRadius: 999, marginBottom: 14 }}>
+                    <LogoMark size={20} />
                 </div>
-                <form onSubmit={handleValidarCodigo} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Email</label>
-                        <input value={email} readOnly style={{ ...loginInput, opacity: 0.7 }} />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Codigo de acesso</label>
-                        <input value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase())} placeholder="ABC-1234-XYZ"
-                            className="mono" style={{ ...loginInput, letterSpacing: '0.1em', textAlign: 'center', fontSize: 20 }}
-                            onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                            onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                    </div>
-                    {error && <div style={{ fontSize: 13, color: '#ffb4ab', fontWeight: 600 }}>{error}</div>}
-                    <button type="submit" disabled={loading} style={{
-                        width: '100%', padding: '13px 20px', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
-                        background: '#fff', color: 'var(--primary)', cursor: 'pointer', marginTop: 8, opacity: loading ? 0.7 : 1,
-                    }}>
-                        {loading ? 'Validando...' : 'Validar codigo'}
-                    </button>
-                    <button type="button" onClick={() => { setStep('login'); setError(''); }} style={{
-                        background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 13, cursor: 'pointer', fontWeight: 600, marginTop: 4,
-                    }}>
-                        Voltar ao login
-                    </button>
-                </form>
-            </>
-        );
+                <h2 className="serif" style={{ fontSize: 32, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.1, color: '#fff' }}>
+                    Bem-vindo de volta
+                </h2>
+                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, marginTop: 8 }}>
+                    Selecione o perfil para continuar.
+                </p>
+            </div>
 
-        if (step === 'criar-senha') return (
-            <>
-                <div style={{ marginBottom: 24 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px', background: 'rgba(255,255,255,0.47)', borderRadius: 999, marginBottom: 14 }}>
-                        <LogoMark size={20} />
-                    </div>
-                    <h2 className="serif" style={{ fontSize: 28, margin: 0, color: '#fff' }}>Crie sua senha</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 8 }}>
-                        Escolha uma senha segura com no minimo 8 caracteres.
-                    </p>
-                </div>
-                <form onSubmit={handleCriarSenha} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Nova senha</label>
-                        <input type="password" value={novaSenha} onChange={(e) => setNovaSenha(e.target.value)} placeholder="Minimo 8 caracteres"
-                            style={loginInput}
-                            onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                            onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                    </div>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Confirmar senha</label>
-                        <input type="password" value={confirmarSenha} onChange={(e) => setConfirmarSenha(e.target.value)} placeholder="Repita a senha"
-                            style={loginInput}
-                            onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                            onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                    </div>
-                    {error && <div style={{ fontSize: 13, color: '#ffb4ab', fontWeight: 600 }}>{error}</div>}
-                    <button type="submit" disabled={loading} style={{
-                        width: '100%', padding: '13px 20px', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
-                        background: '#fff', color: 'var(--primary)', cursor: 'pointer', marginTop: 8, opacity: loading ? 0.7 : 1,
-                    }}>
-                        {loading ? 'Criando...' : 'Criar senha'}
-                    </button>
-                </form>
-            </>
-        );
+            {/* Toggle Admin / Paciente */}
+            <div style={{
+                display: 'flex', borderRadius: 10, overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.25)', marginBottom: 20,
+            }}>
+                <button type="button" onClick={() => setIsAdmin(false)} style={{
+                    flex: 1, padding: '12px 16px', border: 'none', cursor: 'pointer',
+                    fontSize: 14, fontWeight: 600, transition: 'all .15s',
+                    background: !isAdmin ? '#fff' : 'rgba(255,255,255,0.08)',
+                    color: !isAdmin ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                    <Icon name="user" size={16} /> Paciente
+                </button>
+                <button type="button" onClick={() => setIsAdmin(true)} style={{
+                    flex: 1, padding: '12px 16px', border: 'none', cursor: 'pointer',
+                    fontSize: 14, fontWeight: 600, transition: 'all .15s',
+                    borderLeft: '1px solid rgba(255,255,255,0.25)',
+                    background: isAdmin ? '#fff' : 'rgba(255,255,255,0.08)',
+                    color: isAdmin ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                    <Icon name="shield" size={16} /> Admin
+                </button>
+            </div>
 
-        if (step === 'confirmar-email') return (
-            <>
-                <div style={{ marginBottom: 24 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px', background: 'rgba(255,255,255,0.47)', borderRadius: 999, marginBottom: 14 }}>
-                        <LogoMark size={20} />
-                    </div>
-                    <h2 className="serif" style={{ fontSize: 28, margin: 0, color: '#fff' }}>Confirme seu email</h2>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 14, marginTop: 8 }}>
-                        Enviamos um codigo de 6 digitos para <strong style={{ color: '#fff' }}>{email}</strong>.
-                    </p>
-                </div>
-                <form onSubmit={handleConfirmarEmail} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Codigo de confirmacao</label>
-                        <input value={tokenEmail} onChange={(e) => setTokenEmail(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                            placeholder="000000" inputMode="numeric" className="mono"
-                            style={{ ...loginInput, letterSpacing: '0.2em', textAlign: 'center', fontSize: 24 }}
-                            onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                            onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                    </div>
-                    {error && <div style={{ fontSize: 13, color: '#ffb4ab', fontWeight: 600 }}>{error}</div>}
-                    {msg && <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{msg}</div>}
-                    <button type="submit" disabled={loading} style={{
-                        width: '100%', padding: '13px 20px', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
-                        background: '#fff', color: 'var(--primary)', cursor: 'pointer', marginTop: 8, opacity: loading ? 0.7 : 1,
-                    }}>
-                        {loading ? 'Verificando...' : 'Confirmar email'}
-                    </button>
-                    <button type="button" onClick={handleReenviar} disabled={loading} style={{
-                        background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.7)', fontSize: 13, cursor: 'pointer', fontWeight: 600, marginTop: 4,
-                    }}>
-                        Reenviar codigo
-                    </button>
-                    <button type="button" onClick={() => { setStep('login'); setError(''); setMsg(''); }} style={{
-                        background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.5)', fontSize: 12, cursor: 'pointer',
-                    }}>
-                        Voltar ao login
-                    </button>
-                </form>
-            </>
-        );
+            {/* Info do perfil selecionado */}
+            <div style={{
+                padding: '14px 16px', borderRadius: 10,
+                background: 'rgba(255,255,255,0.1)', marginBottom: 20,
+                fontSize: 13, color: 'rgba(255,255,255,0.8)', lineHeight: 1.5,
+            }}>
+                {isAdmin ? (
+                    <>
+                        <strong style={{ color: '#fff' }}>Painel Administrativo</strong>
+                        <br />Gerenciar pacientes, criar acessos e visualizar dados.
+                    </>
+                ) : (
+                    <>
+                        <strong style={{ color: '#fff' }}>Portal do Paciente</strong>
+                        <br />Acompanhar exames, consultas e documentos.
+                    </>
+                )}
+            </div>
 
-        // Login normal
-        return (
-            <>
-                <div style={{ marginBottom: 24 }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 10px 5px 6px', background: 'rgba(255,255,255,0.47)', borderRadius: 999, marginBottom: 14 }}>
-                        <LogoMark size={20} />
-                    </div>
-                    <h2 className="serif" style={{ fontSize: 32, margin: 0, letterSpacing: '-0.01em', lineHeight: 1.1, color: '#fff' }}>
-                        Bem-vindo de volta
-                    </h2>
-                    <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: 15, marginTop: 8 }}>
-                        Acesse com seu email e senha para continuar.
-                    </p>
-                </div>
+            <button type="button" onClick={handleEntrar} style={{
+                width: '100%', padding: '13px 20px', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
+                background: '#fff', color: 'var(--primary)', cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8,
+                transition: 'opacity .12s',
+            }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.92'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+            >
+                Entrar como {isAdmin ? 'Admin' : 'Paciente'} <Icon name="arrow-right" size={16} />
+            </button>
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                    <div>
-                        <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: 6 }}>Email</label>
-                        <input value={email} onChange={(e) => setEmail(e.target.value)} type="email"
-                            placeholder="seu@email.com" style={loginInput}
-                            onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                            onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                    </div>
-
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                            <label style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.7)' }}>Senha</label>
-                            <button type="button" onClick={() => setStep('primeiro-acesso')}
-                                style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.8)', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}>
-                                Primeiro acesso?
-                            </button>
-                        </div>
-                        <div style={{ position: 'relative' }}>
-                            <input type={showPwd ? 'text' : 'password'} value={pwd} onChange={(e) => setPwd(e.target.value)}
-                                placeholder="Digite sua senha" style={{ ...loginInput, paddingRight: 40 }}
-                                onFocus={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.5)'; }}
-                                onBlur={(e) => { e.target.style.borderColor = 'rgba(255,255,255,0.25)'; }} />
-                            <button type="button" onClick={() => setShowPwd((v) => !v)} style={{
-                                position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
-                                width: 30, height: 30, border: 'none', background: 'transparent', cursor: 'pointer',
-                                color: 'rgba(255,255,255,0.6)', borderRadius: 6, display: 'grid', placeItems: 'center',
-                            }}>
-                                <Icon name={showPwd ? 'eye-off' : 'eye'} size={16} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, color: 'rgba(255,255,255,0.75)', cursor: 'pointer', marginTop: 2 }}>
-                        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} style={{ accentColor: '#fff' }} />
-                        Manter conectado neste dispositivo
-                    </label>
-
-                    {error && <div style={{ fontSize: 13, color: '#ffb4ab', fontWeight: 600 }}>{error}</div>}
-                    {msg && <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.9)', fontWeight: 600 }}>{msg}</div>}
-
-                    <button type="submit" disabled={loading} style={{
-                        width: '100%', padding: '13px 20px', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600,
-                        background: '#fff', color: 'var(--primary)', cursor: 'pointer',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 8,
-                        transition: 'opacity .12s', opacity: loading ? 0.7 : 1,
-                    }}
-                        onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.92'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.opacity = loading ? '0.7' : '1'; }}
-                    >
-                        {loading ? 'Entrando...' : <>Entrar <Icon name="arrow-right" size={16} /></>}
-                    </button>
-                </form>
-
-                <div style={{ marginTop: 28, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.15)', fontSize: 11, color: 'rgba(255,255,255,0.5)', textAlign: 'center' }}>
-                    Ao continuar, voce aceita os <a href="#" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'underline' }}>Termos</a> e <a href="#" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'underline' }}>Politica de Privacidade</a>.
-                </div>
-            </>
-        );
-    };
+            <div style={{ marginTop: 16, fontSize: 11, color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>
+                Modo desenvolvimento — login sem autenticacao
+            </div>
+        </>
+    );
 
     return (
         <>

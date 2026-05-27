@@ -58,13 +58,13 @@ export function useAuth() {
 }
 
 export function RequireAdmin({ children }: { children: ReactNode }) {
-    const { user, token } = useAuth();
+    const { user } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!token || user?.perfil !== 'Admin') navigate('/login');
-    }, [token, user, navigate]);
+        if (!user || user.perfil !== 'Admin') navigate('/login');
+    }, [user, navigate]);
 
-    if (!token || user?.perfil !== 'Admin') return null;
+    if (!user || user.perfil !== 'Admin') return null;
     return <>{children}</>;
 }
