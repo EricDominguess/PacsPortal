@@ -74,15 +74,10 @@ function CriarPacienteModal({ onClose, onCreated }: { onClose: () => void; onCre
         try {
             const result = await admin.criarPaciente(nome, email, cpf, dataNascimento);
             onCreated(result);
-        } catch {
-            // TODO: reconectar ao backend — por enquanto gera mock local
-            const codigo = `${rand(3)}-${randNum(4)}-${rand(3)}`;
-            onCreated({ id: crypto.randomUUID(), nome, email, codigoAcesso: codigo, mensagem: 'Paciente criado (modo dev).' });
+        } catch (err: any) {
+            setError(err.mensagem || 'Erro ao criar paciente.');
         } finally { setLoading(false); }
     };
-
-    const rand = (n: number) => Array.from({ length: n }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ'[Math.floor(Math.random() * 24)]).join('');
-    const randNum = (n: number) => Array.from({ length: n }, () => '23456789'[Math.floor(Math.random() * 8)]).join('');
 
     const labelStyle = { display: 'block' as const, fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 6 };
 

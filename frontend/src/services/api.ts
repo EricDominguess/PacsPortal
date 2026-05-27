@@ -43,7 +43,7 @@ export const auth = {
         request<{ mensagem: string }>('/api/auth/reenviar-confirmacao', { method: 'POST', body: JSON.stringify({ email }) }),
 };
 
-/* ── Admin ── */
+/* ── Admin (localStorage — TODO: reconectar ao backend antes de produção) ── */
 export interface PacienteCriado {
     id: string;
     nome: string;
@@ -56,8 +56,8 @@ export interface PacienteResumo {
     id: string;
     nome: string;
     email: string;
-    cpf?: string;
-    dataNascimento?: string;
+    cpf: string;
+    dataNascimento: string;
     ativo: boolean;
     primeiroAcesso: boolean;
     emailConfirmado: boolean;
@@ -71,19 +71,77 @@ export interface ResetarAcessoResponse {
     mensagem: string;
 }
 
+const STORAGE_KEY = 'portal_pacientes';
+
+function getPacientes(): PacienteResumo[] {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+}
+
+function savePacientes(list: PacienteResumo[]) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function gerarCodigo(): string {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const nums = '23456789';
+    const r = (pool: string, n: number) => Array.from({ length: n }, () => pool[Math.floor(Math.random() * pool.length)]).join('');
+    return `${r(chars, 3)}-${r(nums, 4)}-${r(chars, 3)}`;
+}
+
 export const admin = {
-    criarPaciente: (nome: string, email: string, cpf?: string, dataNascimento?: string) =>
-        request<PacienteCriado>('/api/admin/pacientes', { method: 'POST', body: JSON.stringify({ nome, email, cpf: cpf || undefined, dataNascimento: dataNascimento || undefined }) }),
+    criarPaciente: async (nome: string, email: string, cpf: string, dataNascimento: string): Promise<PacienteCriado> => {
+        const list = getPacientes();
+        if (list.some(p => p.email === email)) throw { mensagem: 'Este email ja esta cadastrado.' };
+        if (list.some(p => p.cpf === cpf)) throw { mensagem: 'Este CPF ja esta cadastrado.' };
 
-    listarPacientes: () =>
-        request<PacienteResumo[]>('/api/admin/pacientes'),
+        const codigo = gerarCodigo();
+        const novo: PacienteResumo = {
+            id: crypto.randomUUID(),
+            nome, email, cpf, dataNascimento,
+            ativo: true,
+            primeiroAcesso: true,
+            emailConfirmado: false,
+            dataCriacao: new Date().toISOString(),
+        };
+        list.unshift(novo);
+        savePacientes(list);
 
-    resetarAcesso: (id: string) =>
-        request<ResetarAcessoResponse>(`/api/admin/pacientes/${id}/resetar-acesso`, { method: 'POST' }),
+        return { id: novo.id, nome, email, codigoAcesso: codigo, mensagem: 'Paciente criado com sucesso.' };
+    },
 
-    desativarPaciente: (id: string) =>
-        request<{ mensagem: string }>(`/api/admin/pacientes/${id}/desativar`, { method: 'PATCH' }),
+    listarPacientes: async (): Promise<PacienteResumo[]> => {
+        return getPacientes();
+    },
 
-    ativarPaciente: (id: string) =>
-        request<{ mensagem: string }>(`/api/admin/pacientes/${id}/ativar`, { method: 'PATCH' }),
+    resetarAcesso: async (id: string): Promise<ResetarAcessoResponse> => {
+        const list = getPacientes();
+        const p = list.find(p => p.id === id);
+        if (!p) throw { mensagem: 'Paciente nao encontrado.' };
+
+        p.primeiroAcesso = true;
+        p.emailConfirmado = false;
+        savePacientes(list);
+
+        const novoCodigo = gerarCodigo();
+        return { id: p.id, nome: p.nome, novoCodigo, mensagem: 'Acesso resetado.' };
+    },
+
+    desativarPaciente: async (id: string): Promise<{ mensagem: string }> => {
+        const list = getPacientes();
+        const p = list.find(p => p.id === id);
+        if (!p) throw { mensagem: 'Paciente nao encontrado.' };
+        p.ativo = false;
+        savePacientes(list);
+        return { mensagem: `Paciente ${p.nome} desativado.` };
+    },
+
+    ativarPaciente: async (id: string): Promise<{ mensagem: string }> => {
+        const list = getPacientes();
+        const p = list.find(p => p.id === id);
+        if (!p) throw { mensagem: 'Paciente nao encontrado.' };
+        p.ativo = true;
+        savePacientes(list);
+        return { mensagem: `Paciente ${p.nome} ativado.` };
+    },
 };
