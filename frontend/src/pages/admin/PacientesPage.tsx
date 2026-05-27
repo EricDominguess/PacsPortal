@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Card, Button, Icon, Badge, SectionHeader, EmptyState, inputStyle } from '../../components/ui';
-import { admin, type PacienteResumo, type PacienteCriado, type ResetarAcessoResponse } from '../../services/api';
+import { admin, type PacienteResumo, type PacienteCriado } from '../../services/api';
 
 /* ── Modal de código gerado ── */
 function CodigoModal({ data, onClose }: { data: { nome: string; codigo: string; tipo: string }; onClose: () => void }) {
