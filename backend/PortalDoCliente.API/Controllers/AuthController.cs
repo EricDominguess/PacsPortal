@@ -40,25 +40,33 @@ namespace PortalDoCliente.API.Controllers
         /// Login com email + senha (admin) ou email + senha criada pelo paciente.
         /// Pacientes com PrimeiroAcesso=true não conseguem logar aqui.
         /// </summary>
+        // TODO: MODO DESENVOLVIMENTO — remover validações antes de ir para produção
         [HttpPost("login")]
         public async Task<ActionResult<AuthResponse>> Login([FromBody] LoginRequest request)
         {
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.Email == request.Email && u.Ativo);
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (usuario == null)
-                return Unauthorized(new { mensagem = "Email ou senha inválidos." });
+            {
+                // Se não existe, cria na hora para desenvolvimento
+                var perfil = request.Email.Contains("admin", StringComparison.OrdinalIgnoreCase)
+                    ? Domain.Enums.Perfil.Admin
+                    : Domain.Enums.Perfil.Paciente;
 
-            // Se ainda é primeiro acesso, redirecionar para o fluxo correto
-            if (usuario.PrimeiroAcesso)
-                return BadRequest(new { mensagem = "Este é seu primeiro acesso. Use o código fornecido pelo hospital para criar sua senha.", primeiroAcesso = true });
-
-            if (!_passwordHasher.Verify(request.Senha, usuario.Senha))
-                return Unauthorized(new { mensagem = "Email ou senha inválidos." });
-
-            // Verificar se email foi confirmado (pacientes apenas)
-            if (usuario.Perfil == Domain.Enums.Perfil.Paciente && !usuario.EmailConfirmado)
-                return BadRequest(new { mensagem = "Confirme seu email antes de fazer login. Verifique sua caixa de entrada.", emailNaoConfirmado = true });
+                usuario = new Usuario
+                {
+                    Nome = request.Email.Split('@')[0],
+                    Email = request.Email,
+                    Senha = _passwordHasher.Hash("dev"),
+                    Perfil = perfil,
+                    PrimeiroAcesso = false,
+                    EmailConfirmado = true,
+                    Ativo = true
+                };
+                _context.Usuarios.Add(usuario);
+                await _context.SaveChangesAsync();
+            }
 
             var token = GenerateToken(usuario);
             var expiracao = DateTime.UtcNow.AddHours(8);
