@@ -73,6 +73,13 @@ export interface ResetarAcessoResponse {
 
 const STORAGE_KEY = 'portal_pacientes';
 
+function uuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = (Math.random() * 16) | 0;
+        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+    });
+}
+
 function getPacientes(): PacienteResumo[] {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
@@ -97,7 +104,7 @@ export const admin = {
 
         const codigo = gerarCodigo();
         const novo: PacienteResumo = {
-            id: crypto.randomUUID(),
+            id: uuid(),
             nome, email, cpf, dataNascimento,
             ativo: true,
             primeiroAcesso: true,
