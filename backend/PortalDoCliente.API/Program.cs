@@ -65,13 +65,28 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Seed: cria admin padrão se não existir nenhum
+// Migrate + Seed com retry (aguarda o banco estar pronto no Docker)
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var hasher = scope.ServiceProvider.GetRequiredService<PasswordHasher>();
 
-    db.Database.Migrate();
+    var maxRetries = 10;
+    for (var i = 0; i < maxRetries; i++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            Console.WriteLine(">>> Migrations aplicadas com sucesso.");
+            break;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($">>> Tentativa {i + 1}/{maxRetries} - Banco não pronto: {ex.Message}");
+            if (i == maxRetries - 1) throw;
+            Thread.Sleep(3000);
+        }
+    }
 
     if (!db.Usuarios.Any(u => u.Perfil == PortalDoCliente.Domain.Enums.Perfil.Admin))
     {
