@@ -1,7 +1,7 @@
 version: '3.8'
 
-services:  
-  # Banco de Dados (já fica pronto e rodando para quando você trouxer o backend)
+services:
+  # Banco de Dados PostgreSQL
   db:
     image: postgres:16
     container_name: pacs_db
@@ -15,15 +15,39 @@ services:
     ports:
       - "5432:5432"
 
-  # Portal do Cliente (Front-end compilado no Nginx)
+  # Backend API (.NET 10)
+  api:
+    build: ./backend
+    container_name: pacs_api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__PostgreSQL: "Host=db;Port=5432;Database=pacs_portal_db;Username=admin;Password=admin@123"
+      Jwt__Key: "ChaveDeProducao_TroqueParaUmaChaveSegura_32chars!"
+      Jwt__Issuer: "PortalDoCliente"
+      Email__SmtpHost: ""
+      Email__SmtpPort: "587"
+      Email__SmtpUser: ""
+      Email__SmtpPassword: ""
+      Email__Remetente: ""
+      CorsOrigins: "http://10.31.0.246,http://10.31.0.246:80"
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  # Portal do Cliente (Frontend Nginx + Reverse Proxy)
   portal:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: ""
     container_name: pacs_portal
     restart: unless-stopped
     ports:
-      - "80:80" # Mapeia a porta 80 da VM Debian para a porta 80 do Nginx interno
+      - "80:80"
     depends_on:
-      - db
+      - api
 
 volumes:
   pacs_db_data:

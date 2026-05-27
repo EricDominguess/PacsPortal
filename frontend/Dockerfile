@@ -2,6 +2,10 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
+# Argumento de build para a URL da API (vazio = usa proxy reverso do nginx)
+ARG VITE_API_URL=""
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copia os arquivos de dependências e instala
 COPY package*.json ./
 RUN npm install
@@ -14,10 +18,9 @@ RUN npm run build
 FROM nginx:stable-alpine
 
 # Copia os arquivos compilados do estágio anterior para a pasta pública do Nginx
-# (Nota: mude para /app/build se o seu projeto usar Create React App em vez de Vite)
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Ajuste clássico para sistemas Single Page Application (SPA) não darem erro 404 ao atualizar rotas internas
+# Config do Nginx com proxy reverso para a API
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 

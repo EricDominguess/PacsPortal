@@ -40,12 +40,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// CORS
+// CORS — origens padrão + origens extras via variável de ambiente CORS_ORIGINS
+var corsOrigins = new List<string>
+{
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost",
+    "http://localhost:80"
+};
+var extraOrigins = builder.Configuration["CorsOrigins"];
+if (!string.IsNullOrEmpty(extraOrigins))
+{
+    corsOrigins.AddRange(extraOrigins.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+}
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Frontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.WithOrigins(corsOrigins.ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

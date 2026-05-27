@@ -23,16 +23,26 @@ namespace PortalDoCliente.API.Middleware
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Erro não tratado: {Message}", ex.Message);
-                await HandleExceptionAsync(context);
+                await HandleExceptionAsync(context, ex);
             }
         }
 
-        private static async Task HandleExceptionAsync(HttpContext context)
+        private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-            var response = new { mensagem = "Ocorreu um erro interno no servidor." };
+            var env = context.RequestServices.GetService<IHostEnvironment>();
+            object response;
+            if (env?.IsDevelopment() == true)
+            {
+                response = new { mensagem = "Erro interno no servidor.", erro = ex.Message, stack = ex.StackTrace };
+            }
+            else
+            {
+                response = new { mensagem = "Ocorreu um erro interno no servidor." };
+            }
+
             var json = JsonSerializer.Serialize(response);
             await context.Response.WriteAsync(json);
         }
